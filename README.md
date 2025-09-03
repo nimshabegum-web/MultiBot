@@ -1,172 +1,129 @@
-# Chatbot Capstone - Full-Stack AI Chatbot
+# MultiBot - Full-Stack AI Chatbot
 
-A production-ready, full-stack chatbot with **SSE streaming**, **session persistence**, and **multi-provider model switching**.
+A modern, production-ready chatbot supporting real-time streaming (SSE), multi-model switching (OpenAI, Gemini), and session persistence. Built with React (Vite) and Express.js, deployable on Vercel (frontend) and Render (backend).
+
+---
 
 ## 🚀 Features
-
-- **Real-time streaming** responses with token-by-token display
+- **Real-time streaming** responses (SSE)
 - **Session management** with persistent chat history
-- **Multi-provider support**: OpenAI, Anthropic, Gemini, Ollama (BONUS)
+- **Multi-provider support**: OpenAI, Gemini
 - **Modern React UI** with ChatGPT-like interface
-- **FastAPI backend** with async streaming endpoints
-- **Postgres database** for data persistence
-- **Rate limiting** and token caps for cost control
+- **Express.js backend** with streaming endpoints
+- **Easy deployment**: Vercel (frontend), Render (backend)
 
-## 🏗️ Architecture
+---
 
-```
-Frontend (React + Vite) ←→ Backend (FastAPI) ←→ AI Providers
-                              ↓
-                        Postgres Database
-```
+## 🛠 Technology Stack
+- **Frontend**: React, Vite
+- **Backend**: Express.js, Node.js
+- **AI Providers**: OpenAI, Gemini
+- **Deployment**: Vercel (frontend), Render (backend)
 
-## 📦 Quick Start
+---
 
-### 1. Clone & Setup
+## ⚡ Installation & Setup
+
+### 1. Clone the Repository
 ```bash
-git clone <your-repo>
-cd chatbot-capstone
+git clone <your-repo-url>
+cd MultiBot
 ```
 
 ### 2. Backend Setup
 ```bash
-cd backend
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+cd backend-express
+npm install
+# Create .env file (see .env.example below)
+npm run dev # or npm start
 ```
 
-### 3. Database Setup
-```bash
-# Start Postgres (from project root)
-docker compose up -d
-
-# Or use your own Postgres instance
-# Update DATABASE_URL in .env
-```
-
-### 4. Environment Configuration
-```bash
-# Copy and fill your API keys
-cp env.example .env
-# Edit .env with your actual API keys
-```
-
-### 5. Start Backend
-```bash
-cd backend
-export PYTHONPATH=.
-uvicorn app:app --host 0.0.0.0 --port 8000 --reload
-```
-
-### 6. Start Frontend
+### 3. Frontend Setup
 ```bash
 cd frontend
 npm install
+# Set VITE_API_BASE in Vercel or .env for local
 npm run dev
 ```
 
-Visit: http://localhost:5173
+### 4. Environment Variables
+Create a `.env` file in `backend-express/`:
 
-## 🔧 Configuration
+#### .env.example
+```
+OPENAI_API_KEY=your-openai-key
+GEMINI_API_KEY=your-gemini-key
+MAX_OUTPUT_TOKENS=1024
+```
 
-### Environment Variables
-- `OPENAI_API_KEY`: Your OpenAI API key
-- `ANTHROPIC_API_KEY`: Your Anthropic API key  
-- `GEMINI_API_KEY`: Your Google Gemini API key
-- `OLLAMA_BASE_URL`: Local Ollama instance (optional)
-- `DATABASE_URL`: Postgres connection string
-- `MAX_OUTPUT_TOKENS`: Token limit (default: 1024)
+Set `VITE_API_BASE` in Vercel frontend environment variables:
+```
+VITE_API_BASE=https://<your-backend-on-render>.onrender.com
+```
 
-### AI Providers
-- **OpenAI**: GPT-4o-mini, GPT-4o-mini-translate
-- **Anthropic**: Claude 3.5 Haiku
-- **Gemini**: Gemini 1.5 Flash
-- **Ollama**: Local models (llama3, phi3, qwen2)
+---
 
-## 🧪 Testing
+## 🧪 API Testing Examples
 
-### Test SSE Streaming
+### SSE Streaming (OpenAI)
 ```bash
 curl -N -H "Accept: text/event-stream" \
   -H "Content-Type: application/json" \
   -d '{"messages":[{"role":"user","content":"Hello!"}],"provider":"openai","model":"gpt-4o-mini"}' \
-  http://localhost:8000/chat/<session_id>/stream
+  https://<your-backend-on-render>.onrender.com/chat/<session_id>/stream
 ```
 
-### API Endpoints
-- `GET /models` - Available providers and models
-- `POST /sessions` - Create new chat session
-- `GET /sessions` - List user sessions
-- `GET /sessions/{id}` - Get session messages
-- `POST /chat/{id}/stream` - Stream chat responses (SSE)
-
-## 🎯 Assignment Requirements
-
-This boilerplate covers all **mandatory requirements**:
-
-✅ **SSE Streaming** - Real-time token-by-token responses  
-✅ **Session Management** - Users, sessions, message persistence  
-✅ **Multi-Provider Switching** - OpenAI + Anthropic/Gemini  
-✅ **Modern UI/UX** - ChatGPT-like interface  
-✅ **Database Persistence** - Postgres with SQLAlchemy  
-✅ **Rate Limiting** - Configurable token caps  
-✅ **Environment Security** - .env for API keys  
-
-## 🚀 Deployment
-
-### Local Development
-- Backend: `uvicorn app:app --reload`
-- Frontend: `npm run dev`
-- Database: `docker compose up -d`
-
-### Production Build
+### SSE Streaming (Gemini)
 ```bash
-# Frontend
-cd frontend
-npm run build
-
-# Backend
-cd backend
-uvicorn app:app --host 0.0.0.0 --port 8000
+curl -N -H "Accept: text/event-stream" \
+  -H "Content-Type: application/json" \
+  -d '{"messages":[{"role":"user","content":"Hello!"}],"provider":"gemini","model":"gemini-pro"}' \
+  https://<your-backend-on-render>.onrender.com/chat/<session_id>/stream
 ```
 
-## 🔍 Project Structure
-
-```
-chatbot-capstone/
-├─ backend/                 # FastAPI application
-│  ├─ app.py              # Main API endpoints
-│  ├─ providers/          # AI provider implementations
-│  ├─ models.py           # Database models
-│  ├─ schemas.py          # Pydantic schemas
-│  └─ requirements.txt    # Python dependencies
-├─ frontend/              # React application
-│  ├─ src/
-│  │  ├─ components/      # React components
-│  │  ├─ hooks/          # Custom hooks (useSSE)
-│  │  └─ api/            # API client
-│  └─ package.json       # Node dependencies
-├─ docker-compose.yml     # Postgres setup
-└─ env.example           # Environment template
+### Get Models
+```bash
+curl https://<your-backend-on-render>.onrender.com/models
 ```
 
-## 🎉 Bonus Features
-
-- **Ollama Integration**: Local OSS models
-- **Markdown Rendering**: Rich message display
-- **Copy to Clipboard**: Easy message copying
-- **Responsive Design**: Mobile-friendly interface
-
-## 📚 Next Steps
-
-1. **Customize UI**: Modify colors, fonts, layout
-2. **Add Features**: File uploads, code highlighting
-3. **Enhance Security**: User authentication, rate limiting
-4. **Deploy**: AWS, Vercel, or your preferred platform
+### Create Session
+```bash
+curl -X POST -H "Content-Type: application/json" \
+  -d '{"user_id":"test-user","title":"New Chat"}' \
+  https://<your-backend-on-render>.onrender.com/sessions
+```
 
 ---
 
-**Happy Coding! 🚀**
+## 🖼 Screenshots
 
-This boilerplate gives you a solid foundation to build upon. All the complex parts (SSE, providers, database) are already implemented - focus on your unique features and polish!
+Add screenshots of your application here:
+- Chat UI
+- Model switcher
+- Session sidebar
+
+---
+
+## 👥 Team Members & Contributions
+
+| Name           | Role                | Contributions                |
+|----------------|---------------------|------------------------------|
+| Ayisha Beghum  | Full Stack Developer| Project lead, backend, frontend|
+| Nimsha         | Frontend Developer  | UI/UX, React components      |
+| [Add others]   | [Role]              | [Contributions]              |
+
+---
+
+## 📄 License
+MIT
+
+---
+
+## 💡 Notes
+- For production, restrict CORS origins in backend for security.
+- Make sure to set all required API keys in Render and Vercel.
+- For favicon, add `favicon.ico` to `frontend/` and link in `index.html`.
+
+---
+
+**Happy Chatting! 🤖**
