@@ -38,10 +38,14 @@ app.post("/chat/:session_id/stream", async (req, res) => {
         }
       );
       const data = await geminiResp.json();
-  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-  // Always send a delta, even if empty, so frontend can display response
-  res.write(`data: ${JSON.stringify({ delta: text })}\n\n`);
-  res.write("data: [DONE]\n\n");
+      let text = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+      // If Gemini returns an error, send it to frontend
+      if (data.error) {
+        res.write(`data: ${JSON.stringify({ error: data.error.message || "Gemini API error" })}\n\n`);
+      } else {
+        res.write(`data: ${JSON.stringify({ delta: text })}\n\n`);
+      }
+      res.write("data: [DONE]\n\n");
     } else {
       // OpenAI streaming
       const stream = await openai.chat.completions.create({
