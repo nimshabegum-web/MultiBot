@@ -1,0 +1,29 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: chatbot
+    ports: ["5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  backend:
+    build: ./bluesprings-chatbot-boilerplate/backend
+    command: uvicorn app:app --host 0.0.0.0 --port 8003
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@db:5432/chatbot
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      APP_HOST: 0.0.0.0
+      APP_PORT: 8003
+      CORS_ORIGINS: http://localhost:5173
+    depends_on: [db]
+    ports: ["8003:8003"]
+  frontend:
+    build: ./bluesprings-chatbot-boilerplate/frontend
+    environment:
+      VITE_API_BASE: http://localhost:8003
+    ports: ["5173:5173"]
+volumes: { pgdata: {} }
