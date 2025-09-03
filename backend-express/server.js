@@ -8,7 +8,13 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: [
+    'https://multi-rpe37fqi9-nimshas-projects.vercel.app',
+    'http://localhost:5173'
+  ],
+  credentials: true
+}));
 app.use(bodyParser.json());
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
