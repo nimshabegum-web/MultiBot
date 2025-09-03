@@ -11,6 +11,7 @@ const app = express();
 app.use(cors({
   origin: [
     'https://multi-rpe37fqi9-nimshas-projects.vercel.app',
+    'https://multi-gwdovo6b5-nimshas-projects.vercel.app',
     'http://localhost:5173'
   ],
   credentials: true
